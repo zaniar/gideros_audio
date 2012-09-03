@@ -6,11 +6,11 @@
  by: Edwin Zaniar Putra (zaniar@nightspade.com)
 
  This code is MIT licensed, see http://www.opensource.org/licenses/mit-license.php
- Copyright © 2012 Nightspade (http://nightspade.com).
+ Copyright ï¿½ 2012 Nightspade (http://nightspade.com).
  
 --]]
 
-local Audio = Core.class()
+Audio = Core.class()
 
 function Audio:init()
 	self.bgmChannel = nil
@@ -21,11 +21,45 @@ function Audio:init()
 	self.bgmMute = false
 	self.sfxMute = false
 
-	self.bgm = {}
-	self.sfx = {}
+	self.bgms = {}
+	self.sfxs = {}
 end
 
-function Audio:bgmPlay(name, force)
+function Audio:setBgms(bgms)
+	self.bgms = bgms
+end
+
+function Audio:setSfxs(sfxs)
+	for name, path in pairs(sfxs) do
+		self.sfxs[name] = Sound.new(path)
+	end
+end
+
+function Audio:clearBgms()
+	self.bgms = {}
+end
+
+function Audio:clearSfxs()
+	self.sfxs = {}
+end
+
+function Audio:addBgm(name, path)
+	self.bgms[name] = path
+end
+
+function Audio:addSfx(name, path)
+	self.sfxs[name] = Sound.new(path)
+end
+
+function Audio:removeBgm(name)
+	self.bgms[name] = nil
+end
+
+function Audio:removeSfx(name)
+	self.sfxs[name] = nil
+end
+
+function Audio:playBgm(name, force)
 	if name ~= self.bgmCurrentName or force then
 		if self.bgmChannel then
 			self.bgmChannel:stop()
@@ -36,15 +70,15 @@ function Audio:bgmPlay(name, force)
 		end
 		if not self.bgmMute and not self.bgmChannel then
 			self.bgmCurrentName = name
-			self.bgmCurrent = Sound.new(self.bgm[name])
+			self.bgmCurrent = Sound.new(self.bgms[name])
 			self.bgmChannel = self.bgmCurrent:play(self.bgmPos, math.huge)
 		end
 	end
 end
 
-function Audio:sfxPlay(name)
+function Audio:playSfx(name)
 	if not self.sfxMute then
-		return self.sfx[name]:play()
+		return self.sfxs[name]:play()
 	end
 end
 
@@ -81,5 +115,3 @@ function Audio:unmute(mode)
 		self.sfxMute = false
 	end
 end
-
-audio = Audio.new()
